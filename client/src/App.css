@@ -1,0 +1,10 @@
+#player-name, #state {
+	font-size: 8px;
+}
+
+#game-wrapper {
+	width: 600px;
+	height: 600px;
+	background: #eee;
+	margin: 20px 0;
+}
