@@ -39,6 +39,9 @@ function Create(id, socket) {
 }
 
 function move(dir, state) {
+
+	// TODO: set cantMoveUntilTics: currentTick + xx??
+
 	if (dir === 37) {
 		state.x = state.x - speed;
 	}
