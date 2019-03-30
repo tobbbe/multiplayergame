@@ -9,6 +9,7 @@ let tickLengthMs = 1000 / TICK_RATE;
 const data = {
 	ticks: 0
 }
+console.log({ tickLengthMs });
 
 function hrtimeMs() {
 	let time = process.hrtime();

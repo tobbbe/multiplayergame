@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Tile.css'
 
-export default function Tile({ player }) {
+const Tile = React.memo(function Tile({ player }) {
 	const [classNames, setClass] = useState('tile');
 
 	useEffect(() => {
@@ -20,4 +20,6 @@ export default function Tile({ player }) {
 	return (
 		<div className={classNames}></div>
 	);
-}
+})
+
+export default Tile;

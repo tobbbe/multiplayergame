@@ -9,21 +9,26 @@ let sleeping = false;
 
 export default function App() {
 	const [gameState, setGameState] = useState({});
-	const [player, setPlayer] = useState(JSON.parse(localStorage.getItem('game-cache') || '{}'));
+	const [player, setPlayer] = useState();
 
 	useEffect(() => {
+		const cachedPlayer = JSON.parse(localStorage.getItem('game-cache') || '{}');
+		setPlayer(cachedPlayer)
+
+		console.log('connecting to websockets on', window.location.origin);
 		const socket = window.io(window.location.origin, {
-			query: player.id ? "playerId=" + player.id : "",
+			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
+			transports: ['websocket']
 		});
 
-		window.addEventListener('keydown', e => {
+		window.addEventListener('keyup', e => {
 
 			// prevent spamming the server
-			if (sleeping) return;
-			sleeping = true;
-			setTimeout(() => {
-				sleeping = false;
-			}, Math.floor(gameState.tickLengthMs));
+			// if (sleeping) return;
+			// sleeping = true;
+			// setTimeout(() => {
+			// 	sleeping = false;
+			// }, Math.floor(gameState.tickLengthMs));
 
 			let payload;
 
@@ -81,4 +86,3 @@ export default function App() {
 		</div>
 	);
 }
-

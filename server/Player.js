@@ -7,13 +7,14 @@ const walkCooldown = 3;
 
 
 
-function Create(id, socket) {
+function Create({ id, socket, x, y, color }) {
 	const player = {
-		x: 0,
-		y: 0,
+		x: x || 0,
+		y: y || 0,
 		connected: true,
-		color: '#111',
-		cantMoveUntil: 0
+		color: color || '#111',
+		cantMoveUntil: 0,
+		id // TODO: remove
 	}
 
 	socket.emit('player:connected', { id })
@@ -48,7 +49,7 @@ function Create(id, socket) {
 
 function move(player, dir) {
 
-	if (gameEngine.data.ticks <= player.cantMoveUntil) {
+	if (gameEngine.data.ticks < player.cantMoveUntil) {
 		return;
 	}
 
@@ -56,20 +57,36 @@ function move(player, dir) {
 	const { x: oldX, y: oldY } = player;
 
 	if (dir === "LEFT" && player.x !== 0) {
-		player.x = player.x - step;
-		changed = true;
+		const newX = player.x - step;
+
+		if (!gameState.tiles[player.y][newX].player) {
+			player.x = newX;
+			changed = true;
+		}
 	}
 	else if (dir === "UP" && player.y !== 0) {
-		player.y = player.y - step;
-		changed = true;
+		const newY = player.y - step;
+
+		if (!gameState.tiles[newY][player.x].player) {
+			player.y = player.y - step;
+			changed = true;
+		}
 	}
 	else if (dir === "RIGHT" && player.x < settings.boardSize - 1) {
-		player.x = player.x + step;
-		changed = true;
+		const newX = player.x + step;
+
+		if (!gameState.tiles[player.y][newX].player) {
+			player.x = player.x + step;
+			changed = true;
+		}
 	}
 	else if (dir === "DOWN" && player.y < settings.boardSize - 1) {
-		player.y = player.y + step;
-		changed = true;
+		const newY = player.y + step;
+
+		if (!gameState.tiles[newY][player.x].player) {
+			player.y = player.y + step;
+			changed = true;
+		}
 	}
 
 	if (changed) {

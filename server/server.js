@@ -9,18 +9,18 @@ const gameEngine = require('./game-engine');
 const settings = require('./game-settings');
 const gameState = require('./game-state');
 
-let pause = false;
+const dev = false;
 
-app.use('/static', express.static(path.join(__dirname, '../client')))
+app.use('/static', express.static(path.join(__dirname, (dev ? '../client' : '/build/static'))))
 
 app.get('/', function (req, res) {
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + (dev ? '/index.html' : '/build/index.html'));
 });
 
 io.on('connection', function (socket) {
 	let id = socket.handshake.query.playerId || uuidV4();
 	console.log('a user connected', id);
-	gameState.players[id] = Player.Create(id, socket);
+	gameState.players[id] = Player.Create({ ...(gameState.players[id] ? gameState.players[id].state : {}), id, socket });
 });
 
 http.listen(5000, function () {
