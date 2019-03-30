@@ -15,10 +15,10 @@ export default function App() {
 		const cachedPlayer = JSON.parse(localStorage.getItem('game-cache') || '{}');
 		setPlayer(cachedPlayer)
 
-		console.log('connecting to websockets on', window.location.origin);
+		console.log('connecting to websockets on', window.location.origin, window.location.origin.indexOf('3000') && 'websockets funkar antagligen inte. du är på port 3000');
 		const socket = window.io(window.location.origin, {
 			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
-			transports: ['websocket']
+			//transports: ['websocket']
 		});
 
 		window.addEventListener('keyup', e => {
