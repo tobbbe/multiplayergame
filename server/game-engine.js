@@ -1,8 +1,3 @@
-module.exports = {
-	init,
-	queueUpdate
-}
-
 let _needsUpdate = false;
 
 let config = null;
@@ -11,6 +6,9 @@ let hasStarted = false;
 const TICK_RATE = 30;
 let previous = hrtimeMs();
 let tickLengthMs = 1000 / TICK_RATE;
+const data = {
+	ticks: 0
+}
 
 function hrtimeMs() {
 	let time = process.hrtime();
@@ -27,6 +25,7 @@ const loop = () => {
 		_needsUpdate = false;
 	}
 
+	data.ticks++;
 	previous = now;
 }
 
@@ -44,4 +43,11 @@ function init(_config) {
 
 function queueUpdate() {
 	_needsUpdate = true;
+}
+
+module.exports = {
+	init,
+	queueUpdate,
+	data,
+	tickLengthMs
 }

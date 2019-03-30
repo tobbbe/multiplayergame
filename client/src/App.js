@@ -1,54 +1,84 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Tile from "./components/Tile";
 
-class App extends Component {
+let sleeping = false;
 
-	componentDidMount() {
-		// LABYRINTSPEL?!
-		// HITTA POWER UPS (göra hål i väggar, skjuta osv)
+// LABYRINTSPEL?!
+// HITTA POWER UPS (göra hål i väggar, skjuta osv)
 
-		const gameStateEl = document.getElementById('state');
-		const playerNameEl = document.getElementById('player-name');
-		let player = JSON.parse(localStorage.getItem('game-cache') || '{}')
+export default function App() {
+	const [gameState, setGameState] = useState({});
+	const [player, setPlayer] = useState(JSON.parse(localStorage.getItem('game-cache') || '{}'));
+
+	useEffect(() => {
 		const socket = window.io(window.location.origin, {
-			query: player.playerId ? "playerId=" + player.playerId : "",
+			query: player.id ? "playerId=" + player.id : "",
 		});
 
-		// TODO: prevent holding key down? + serverside
 		window.addEventListener('keydown', e => {
-			socket.emit('player:action', { type: 'MOVE', payload: e.keyCode })
+
+			// prevent spamming the server
+			if (sleeping) return;
+			sleeping = true;
+			setTimeout(() => {
+				sleeping = false;
+			}, Math.floor(gameState.tickLengthMs));
+
+			let payload;
+
+			switch (e.keyCode) {
+				case 37:
+					payload = "LEFT"
+					break;
+
+				case 38:
+					payload = "UP"
+					break;
+
+				case 39:
+					payload = "RIGHT"
+					break;
+
+				case 40:
+					payload = "DOWN"
+					break;
+
+				default:
+					break;
+			}
+
+			if (payload) {
+				socket.emit('player:action', { type: 'MOVE', payload })
+			}
 		});
 
 		socket.on('state:update', (data) => {
-			gameStateEl.innerHTML = JSON.stringify(data, null, 2);
+			//console.log(data);
+			setGameState(data);
 		});
 
 		socket.on('player:connected', (data) => {
 			console.log('player:connected', data);
-			player = data;
-			playerNameEl.innerHTML = data.playerId;
 			localStorage.setItem('game-cache', JSON.stringify(data));
+			setPlayer(data);
 		});
-	}
 
-	render() {
-		return (
-			<div className="App">
-				<div id="player-name"></div>
-				<pre id="state"></pre>
+		return socket.close;
+	}, [])
+
+	return (
+		<div className="App">
+			{/* <div style={{ position: 'absolute', right: 0, height: 300, overflow: 'auto' }}>
+				<div id="player-name">{player.id}</div>
+				<pre id="state">{JSON.stringify(gameState, null, 2)}</pre>
+			</div> */}
+			{gameState && gameState.tiles &&
 				<div id="game-wrapper">
-					{tiles.map((t, i) => <Tile key={i} />)}
+					{gameState.tiles.map((row, ri) => row.map((tile, i) => <Tile key={i} {...tile} />))}
 				</div>
-			</div>
-		);
-	}
-}
-
-export default App;
-
-const tiles = [];
-for (let i = 0; i < 3600; i++) {
-	tiles.push({})
+			}
+		</div>
+	);
 }
 

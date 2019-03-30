@@ -1,28 +1,34 @@
 const gameEngine = require('./game-engine');
+const gameState = require('./game-state');
+const settings = require('./game-settings');
 
-const speed = 1;
+const step = 1;
+const walkCooldown = 3;
+
+const player = {
+	x: 0,
+	y: 0,
+	connected: true,
+	color: '#111',
+	cantMoveUntil: 0
+}
 
 function Create(id, socket) {
-	const state = {
-		x: 0,
-		y: 0,
-		connected: true
-	}
-
-	socket.emit('player:connected', { playerId: id })
+	socket.emit('player:connected', { id })
+	gameState.tiles[player.y][player.x].player = { ...player };
 	gameEngine.queueUpdate();
 
 	socket.on('disconnect', function () {
-		state.connected = false;
+		player.connected = false;
 		console.log('user disconnected');
 	});
 
 	socket.on('player:action', function (action) {
-		console.log(action);
+		// TODO: prevent client to send (ex hold down) to often
 
 		switch (action.type) {
 			case 'MOVE':
-				move(action.payload, state)
+				move(action.payload)
 				break;
 
 			default:
@@ -33,28 +39,44 @@ function Create(id, socket) {
 
 	return {
 		id,
-		state,
+		state: player,
 		move
 	}
 }
 
-function move(dir, state) {
+function move(dir) {
 
-	// TODO: set cantMoveUntilTics: currentTick + xx??
+	if (gameEngine.data.ticks <= player.cantMoveUntil) {
+		return;
+	}
 
-	if (dir === 37) {
-		state.x = state.x - speed;
+	let changed = false;
+	const { x: oldX, y: oldY } = player;
+
+	if (dir === "LEFT" && player.x !== 0) {
+		player.x = player.x - step;
+		changed = true;
 	}
-	else if (dir === 38) {
-		state.y = state.y - speed;
+	else if (dir === "UP" && player.y !== 0) {
+		player.y = player.y - step;
+		changed = true;
 	}
-	else if (dir === 39) {
-		state.x = state.x + speed;
+	else if (dir === "RIGHT" && player.x < settings.boardSize - 1) {
+		player.x = player.x + step;
+		changed = true;
 	}
-	else if (dir === 40) {
-		state.y = state.y + speed;
+	else if (dir === "DOWN" && player.y < settings.boardSize - 1) {
+		player.y = player.y + step;
+		changed = true;
 	}
-	gameEngine.queueUpdate();
+
+	if (changed) {
+		gameState.tiles[player.y][player.x].player = { ...player };
+		gameState.tiles[oldY][oldX].player = null;
+
+		player.cantMoveUntil = gameEngine.data.ticks + walkCooldown;
+		gameEngine.queueUpdate();
+	}
 }
 
 module.exports.Create = Create;

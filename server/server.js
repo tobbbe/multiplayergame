@@ -6,15 +6,10 @@ const io = require('socket.io')(http);
 const uuidV4 = require('uuid/v4');
 const Player = require('./Player');
 const gameEngine = require('./game-engine');
+const settings = require('./game-settings');
+const gameState = require('./game-state');
 
 let pause = false;
-let gameState = {
-	players: {},
-	sceen: {
-		width: 60,
-		height: 60
-	}
-};
 
 app.use('/static', express.static(path.join(__dirname, '../client')))
 
@@ -44,6 +39,9 @@ gameEngine.init({
 
 function gameStateFormatted() {
 	return {
-		players: Object.keys(gameState.players).map(id => gameState.players[id].state)
+		players: Object.keys(gameState.players).map(id => gameState.players[id].state),
+		tiles: gameState.tiles,
+		tickLengthMs: gameEngine.tickLengthMs
 	}
 }
+
