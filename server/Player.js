@@ -5,15 +5,17 @@ const settings = require('./game-settings');
 const step = 1;
 const walkCooldown = 3;
 
-const player = {
-	x: 0,
-	y: 0,
-	connected: true,
-	color: '#111',
-	cantMoveUntil: 0
-}
+
 
 function Create(id, socket) {
+	const player = {
+		x: 0,
+		y: 0,
+		connected: true,
+		color: '#111',
+		cantMoveUntil: 0
+	}
+
 	socket.emit('player:connected', { id })
 	gameState.tiles[player.y][player.x].player = { ...player };
 	gameEngine.queueUpdate();
@@ -28,7 +30,7 @@ function Create(id, socket) {
 
 		switch (action.type) {
 			case 'MOVE':
-				move(action.payload)
+				move(player, action.payload)
 				break;
 
 			default:
@@ -44,7 +46,7 @@ function Create(id, socket) {
 	}
 }
 
-function move(dir) {
+function move(player, dir) {
 
 	if (gameEngine.data.ticks <= player.cantMoveUntil) {
 		return;
