@@ -2,23 +2,27 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Tile from "./components/Tile";
 
+// eslint-disable-next-line no-unused-vars
 let sleeping = false;
 
 // LABYRINTSPEL?!
 // HITTA POWER UPS (göra hål i väggar, skjuta osv)
 
 export default function App() {
-	const [gameState, setGameState] = useState({});
+	// eslint-disable-next-line no-unused-vars
 	const [player, setPlayer] = useState();
+	const [gameState, setGameState] = useState({});
 
 	useEffect(() => {
 		const cachedPlayer = JSON.parse(localStorage.getItem('game-cache') || '{}');
 		setPlayer(cachedPlayer)
 
-		console.log('connecting to websockets on', window.location.origin, window.location.origin.indexOf('3000') > -1 && 'websockets funkar antagligen inte. du är på port 3000');
+		console.log('connecting to websockets on', window.location.origin, window.location.origin.indexOf('3000') > -1 && 'websockets funkar antagligen inte. du är på port 3000.');
+		console.log('note to self: client/ måste byggas och läggas i servern. sen kan du köra websockets på serverns port (tex 5000). ALLTSÅ: surfa till http://(ip/localhost):5000 istället');
+
 		const socket = window.io(window.location.origin, {
 			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
-			//transports: ['websocket']
+			//transports: ['websocket'] // OBS! kan kommenteras tillbaka om du kör på servern och inte reacts livereload
 		});
 
 		window.addEventListener('keyup', e => {
