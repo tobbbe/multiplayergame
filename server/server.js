@@ -45,7 +45,8 @@ function gameStateFormatted() {
 	return {
 		players: Object.keys(gameState.players).map(id => gameState.players[id].state),
 		tiles: gameState.tiles,
-		tickLengthMs: gameEngine.tickLengthMs
+		tickLengthMs: gameEngine.tickLengthMs,
+		sendAt: Date.now()
 	}
 }
 

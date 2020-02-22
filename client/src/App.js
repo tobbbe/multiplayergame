@@ -70,7 +70,13 @@ export default function App() {
 		});
 
 		socket.on('state:update', (data) => {
-			//console.log(data);
+			// console.log(data);
+
+			// uncomment to see how long it takes to
+			// emit and recieve state:update
+			// const time = Date.now();
+			// console.log(time - data.sendAt)
+
 			setGameState(data);
 		});
 

@@ -9,25 +9,15 @@
 
 .player-tile {
 	background-color: #111;
-	animation-duration: 1s;
-  animation-name: move;
+
+	animation:
+		pulse .6s infinite;
 }
 
 .player-smoke {
 	background-color: #666;
 	animation-duration: 1s;
   animation-name: smoke;
-}
-
-@keyframes move {
-  from {
-    transform: scale(.7);
-  }
-
-  to {
-		opacity: 1;
-    transform: scale(1);
-  }
 }
 
 @keyframes smoke {
@@ -38,5 +28,13 @@
   to {
 		opacity: 1;
     transform: scale(0);
+  }
+}
+
+@keyframes pulse {
+  from {
+		transform: scale(.6);
+	}
+	to {
   }
 }
