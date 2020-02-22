@@ -12,6 +12,7 @@ export default function App() {
 	// eslint-disable-next-line no-unused-vars
 	const [player, setPlayer] = useState();
 	const [gameState, setGameState] = useState({ loading: true });
+	const [log, setLog] = useState();
 
 	const init = React.useCallback(async function init() {
 		const cachedPlayer = JSON.parse(localStorage.getItem('game-cache') || '{}');
@@ -74,8 +75,9 @@ export default function App() {
 
 			// uncomment to see how long it takes to
 			// emit and recieve state:update
-			// const time = Date.now();
-			// console.log(time - data.sendAt)
+			const time = Date.now();
+			console.log(time - data.sendAt)
+			setLog(time - data.sendAt)
 
 			setGameState(data);
 		});
@@ -113,6 +115,7 @@ export default function App() {
 				<div id="player-name">{player.id}</div>
 				<pre id="state">{JSON.stringify(gameState, null, 2)}</pre>
 			</div> */}
+			<pre>{JSON.stringify(log)}</pre>
 			{gameState && gameState.tiles &&
 				<div className="game-wrapper">
 					{gameState.tiles.map((row, ri) => row.map((tile, i) => <Tile key={i} {...tile} />))}

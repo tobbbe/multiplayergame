@@ -11,5 +11,9 @@ test on http://localhost:3000
 ## to run prod
 everything is run from server
 
-to create/update prod build, run: `npm run build` in client/
+first create/update prod build: `npm run build` in client/
 => files are copied from client/build to server/build
+
+then run `npm run prod` in server/
+
+access on http://localhost:5000
