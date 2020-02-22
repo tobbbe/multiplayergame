@@ -6,15 +6,19 @@ const io = require('socket.io')(http);
 const uuidV4 = require('uuid/v4');
 const Player = require('./Player');
 const gameEngine = require('./game-engine');
-const settings = require('./game-settings');
+const { dev, port } = require('./game-settings');
 const gameState = require('./game-state');
 
-const dev = false;
+console.log(dev ? 'running DEV' : 'running PROD')
 
 app.use('/static', express.static(path.join(__dirname, (dev ? '../client' : '/build/static'))))
 
 app.get('/', function (req, res) {
 	res.sendFile(__dirname + (dev ? '/index.html' : '/build/index.html'));
+});
+
+app.get('/setup', function (req, res) {
+	res.send({ port });
 });
 
 io.on('connection', function (socket) {
@@ -23,8 +27,8 @@ io.on('connection', function (socket) {
 	gameState.players[id] = Player.Create({ ...(gameState.players[id] ? gameState.players[id].state : {}), id, socket });
 });
 
-http.listen(5000, function () {
-	console.log('listening on *:5000');
+http.listen(port, function () {
+	console.log('listening on *:' + port);
 });
 
 function gameUpdate(delta) {

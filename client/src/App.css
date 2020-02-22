@@ -1,10 +1,24 @@
+
 #player-name, #state {
 	font-size: 8px;
 }
 
-#game-wrapper {
+.app {
+	padding: 20px;
+}
+
+.game-wrapper {
 	width: 600px;
 	height: 600px;
 	background: #eee;
-	margin: 20px 0;
+}
+
+.loader {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
 }

@@ -11,19 +11,26 @@ let sleeping = false;
 export default function App() {
 	// eslint-disable-next-line no-unused-vars
 	const [player, setPlayer] = useState();
-	const [gameState, setGameState] = useState({});
+	const [gameState, setGameState] = useState({ loading: true });
 
-	useEffect(() => {
+	const init = React.useCallback(async function init() {
 		const cachedPlayer = JSON.parse(localStorage.getItem('game-cache') || '{}');
 		setPlayer(cachedPlayer)
 
-		console.log('connecting to websockets on', window.location.origin, window.location.origin.indexOf('3000') > -1 && 'websockets funkar antagligen inte. du är på port 3000.');
-		console.log('note to self: client/ måste byggas och läggas i servern. sen kan du köra websockets på serverns port (tex 5000). ALLTSÅ: surfa till http://(ip/localhost):5000 istället');
+		const setupResp = await fetch('/setup');
+		const setup = await setupResp.json();
 
-		const socket = window.io(window.location.origin, {
+		console.log(setup)
+
+		const socket = window.io('http://localhost:' + setup.port, {
 			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
+			timeout: 3000,
 			transports: ['websocket'] // OBS! kan kommenteras tillbaka om du kör på servern och inte reacts livereload
 		});
+
+		socket.on('connect_error', err => handleErrors(err));
+		socket.on('connect_failed', err => handleErrors(err));
+		socket.on('disconnect', err => handleErrors(err));
 
 		window.addEventListener('keyup', e => {
 
@@ -76,14 +83,32 @@ export default function App() {
 		return socket.close;
 	}, [])
 
+	useEffect(() => {
+		init()
+	}, [init])
+
+	function handleErrors(error) {
+		console.log(error)
+		setGameState({ error });
+	}
+
+	if (gameState.loading) return (<span className="loader">loading...</span>);
+	if (gameState.error) return (
+		<>
+			<h2>Something went wrong :(</h2>
+			<p>see console for more info</p>
+			<pre>{JSON.stringify(gameState.error, null, 1)}</pre>
+		</>
+	);
+
 	return (
-		<div className="App">
+		<div className="app">
 			{/* <div style={{ position: 'absolute', right: 0, height: 300, overflow: 'auto' }}>
 				<div id="player-name">{player.id}</div>
 				<pre id="state">{JSON.stringify(gameState, null, 2)}</pre>
 			</div> */}
 			{gameState && gameState.tiles &&
-				<div id="game-wrapper">
+				<div className="game-wrapper">
 					{gameState.tiles.map((row, ri) => row.map((tile, i) => <Tile key={i} {...tile} />))}
 				</div>
 			}

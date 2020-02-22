@@ -1,3 +1,6 @@
 module.exports = {
-	boardSize: 60
+	dev: process.env.NODE_ENV === 'development',
+	port: 5000,
+
+	boardSize: 60,
 }
