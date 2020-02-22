@@ -9,7 +9,7 @@ const gameEngine = require('./game-engine');
 const settings = require('./game-settings');
 const gameState = require('./game-state');
 
-const dev = true;
+const dev = false;
 
 app.use('/static', express.static(path.join(__dirname, (dev ? '../client' : '/build/static'))))
 

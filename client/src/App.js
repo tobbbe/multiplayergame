@@ -22,7 +22,7 @@ export default function App() {
 
 		const socket = window.io(window.location.origin, {
 			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
-			//transports: ['websocket'] // OBS! kan kommenteras tillbaka om du kör på servern och inte reacts livereload
+			transports: ['websocket'] // OBS! kan kommenteras tillbaka om du kör på servern och inte reacts livereload
 		});
 
 		window.addEventListener('keyup', e => {
