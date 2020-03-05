@@ -23,7 +23,13 @@ export default function App() {
 
 		console.log(setup)
 
-		const socket = window.io('http://localhost:' + setup.port, {
+		const server = window.location.origin.includes('localhost') ?
+			'http://localhost:' + setup.port :
+			window.location.origin;
+
+		setLog(state => ({ ...state, server }))
+
+		const socket = window.io(server, {
 			query: cachedPlayer.id ? "playerId=" + cachedPlayer.id : "",
 			timeout: 3000,
 			transports: ['websocket'] // OBS! kan kommenteras tillbaka om du kör på servern och inte reacts livereload
@@ -76,8 +82,8 @@ export default function App() {
 			// uncomment to see how long it takes to
 			// emit and recieve state:update
 			const time = Date.now();
-			console.log(time - data.sendAt)
-			setLog(time - data.sendAt)
+			setLog(state => ({ ...state, ping: time - data.sendAt }))
+			// console.log(time - data.sendAt)
 
 			setGameState(data);
 		});
@@ -115,7 +121,7 @@ export default function App() {
 				<div id="player-name">{player.id}</div>
 				<pre id="state">{JSON.stringify(gameState, null, 2)}</pre>
 			</div> */}
-			<pre>{JSON.stringify(log)}</pre>
+			<pre style={{ fontSize: 10 }}>{JSON.stringify(log)}</pre>
 			{gameState && gameState.tiles &&
 				<div className="game-wrapper">
 					{gameState.tiles.map((row, ri) => row.map((tile, i) => <Tile key={i} {...tile} />))}
